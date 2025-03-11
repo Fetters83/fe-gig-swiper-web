@@ -1,16 +1,26 @@
 import { useContext } from "react";
 import { StyleSheet, Text, View, Button, Linking } from "react-native";
 import { LikedGigContext } from "../contexts/LikedGigContext";
+import UseAuth from "../hooks/UserAuth";
+import { removeGig } from "../api";
 
 export function SavedGigInfo(currentGig) {
 
   const {setLikedGigs}= useContext(LikedGigContext)
   const {id, description, date, doorsopening, doorsclosing, lastentry, location, postcode, town, link} = currentGig.currentGig
+  const { user } = UseAuth()
+  
 
   function removeLikedGig(selectedId) {
-    setLikedGigs(oldValues =>{
-      return oldValues.filter((gig) => gig.id !== selectedId)
-    })
+    console.log(selectedId)
+    if(user){
+      removeGig(user.email,selectedId).then(()=>{
+        setLikedGigs(oldValues =>{
+          return oldValues.filter((gig) => gig.id !== selectedId)
+        })
+      })
+    }
+
   }
 
   return (
