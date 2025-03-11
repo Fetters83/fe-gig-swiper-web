@@ -14,14 +14,16 @@ export function GigCard(props) {
   const { toggleGigInfoVisible, setCurrentGig, stackNumber, setStackNumber, animateButton, animateButton2, scaleValue, rotateInterpolate, rotateValue } = props
   const { gigStack } = useContext(GigStackContext)
   const { setLikedGigs, likedGigs } = useContext(LikedGigContext)
-  const [ spotifyTrack, setSpotifyTrack ] = useState(true)
+ /*  const [ spotifyTrack, setSpotifyTrack ] = useState(true) */
+  const [ previewTrack, setPreviewTrack ] = useState(false)
   const [ likedIds, setLikedIds ] = useState([])
   const { dislikedIds, setDislikedIds } = useContext(DislikedGigContext)
   const imageurl = gigStack[stackNumber].xlargeimageurl
   const [isLikeTouched, setIsLikeTouched] = useState(true)
   const [isDislikeTouched, setIsDislikeTouched] = useState(true)
   const [isEitherClicked, setIsEitherClicked] = useState(true)
-  const [spotifyPreviewUrl, setSpotifyPreviewUrl] = useState(null)  
+  /* const [spotifyPreviewUrl, setSpotifyPreviewUrl] = useState(null) */
+  const [previewUrl, setPreviewUrl] = useState(null)   
 
   function handleLike() {
     animateButton2()
@@ -49,22 +51,55 @@ export function GigCard(props) {
     )
   }
 
-  useEffect(() => { 
+ /*  useEffect(() => { 
     setCurrentGig(gigStack[stackNumber])
-    setSpotifyTrack(true)
+
     if(gigStack[stackNumber].artists) {
       if(gigStack[stackNumber].artists[0]){
+        console.log("in useeffect")
         getArtistTopTrack(gigStack[stackNumber].artists[0].name)
-        .then(({data:{spotifyTrack:{topTrack}}}) => {
-          setSpotifyPreviewUrl(topTrack)
-          /* console.log(spotifyTrack) */
-          setSpotifyTrack(topTrack) 
+        .then((response) => {
+          console.log(response)
+       
+          setPreviewUrl(response)
+       
+         setPreviewTrack(true)
+        }).catch((error)=>{
+          console.log(error)
+          setPreviewTrack(false)
         })
         } else {
-          setSpotifyTrack(false)
+          setPreviewTrack(false)
         }
       } 
-  }, [stackNumber, gigStack])
+  }, [stackNumber, gigStack]) */
+
+  useEffect(() => { 
+    setCurrentGig(gigStack[stackNumber]);
+
+    if (gigStack[stackNumber]?.artists?.length > 0) {
+        console.log("in useEffect: ", gigStack[stackNumber].artists[0].name);
+
+        getArtistTopTrack(gigStack[stackNumber].artists[0].name)
+            .then((previewUrl) => {
+                console.log("Preview URL:", previewUrl);
+                setPreviewUrl(previewUrl);
+                setPreviewTrack(true);
+            })
+            .catch((error) => {
+                console.error("Failed to fetch preview track:", error.message);
+                setPreviewTrack(false);
+            });
+    } else {
+        setPreviewTrack(false);
+    }
+}, [stackNumber, gigStack]);
+
+useEffect(() => {
+  if (likedIds.includes(gigStack[stackNumber].id) || dislikedIds.includes(gigStack[stackNumber].id)) {
+    setStackNumber((prev) => prev + 1);
+  }
+}, [stackNumber, gigStack, likedIds, dislikedIds]);
 
   function handleDislikeById() {
     animateButton()
@@ -80,11 +115,11 @@ export function GigCard(props) {
     setDislikedIds([])
   }
 
-  {
+ /*  {
     if (likedIds.includes(gigStack[stackNumber].id || dislikedIds.includes(gigStack[stackNumber].id))) {
       setStackNumber(stackNumber + 1)
     }
-  }
+  } */
 
   function toggleTouchLike() {
     setIsLikeTouched(false)
@@ -151,7 +186,7 @@ export function GigCard(props) {
               </Pressable>
             </View>
             <View>
-            {spotifyTrack && <AudioPlayer url={spotifyPreviewUrl}></AudioPlayer>}
+            {previewTrack && <AudioPlayer url={previewUrl}></AudioPlayer>}
             </View>
           </View>
               )}

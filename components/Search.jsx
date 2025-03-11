@@ -11,7 +11,8 @@ import Radius from "./Radius";
 export function Search() {
 
   const [locationSearch, setLocationSearch] = useState('')
-  const { setGigStack, gigStack } = useContext(GigStackContext)
+/*   const { setGigStack, gigStack } = useContext(GigStackContext) */
+const { gigStack,setGigStack} = useContext(GigStackContext)
   const { setLikedGigs, likedGigs } = useContext(LikedGigContext)
   const { dislikedIds, setDislikedIds } = useContext(DislikedGigContext)
   const [radiusTab, setRadiusTab] = useState(false)
@@ -19,7 +20,7 @@ export function Search() {
   const [emergentModal, setEmergentModal] = useState(false)
   const {loading, setLoading} = useContext(LoadingContext)
 
- 
+ console.log(radius)
   function handleRadius() {
     if (!radiusTab) {
       setRadiusTab(true)
@@ -34,7 +35,9 @@ export function Search() {
       getAllEvents(locationSearch,radius).then((events)=>{
         if (likedGigs.length > 0) {
           let filter = events.filter(event => !likedGigs.includes(event.id) && !dislikedIds.includes(event.id))
+          console.log(filter)
           setGigStack(filter)
+          console.log(gigStack)
         } else {
           setGigStack(events)
         }

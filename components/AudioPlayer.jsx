@@ -4,7 +4,7 @@ function AudioPlayer({ url }) {
   const audioRef = useRef(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [progress, setProgress] = useState(0);
-
+console.log(url)
   useEffect(() => {
     if (audioRef.current) {
       audioRef.current.pause();
